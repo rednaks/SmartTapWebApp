@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Line Chart</title>
+    <meta charset="utf-8"/>
+		<script src="js/Chart.js"></script>
+	</head>
+	<body>
+		<div style="width:30%">
+			<div>
+				<canvas id="canvas" height="550" width="600"></canvas>
+			</div>
+		</div>
+
+
+
+
+	<script>
+
+    function getDate(aTimestamp){
+      var date = new Date(aTimestamp*1000);
+      return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    }
+    var request;
+
+    function plotChart() {
+      var responseObj = JSON.parse(request.responseText);
+
+      var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
+      var labelsID = [];
+      var mydata = [];
+
+      labelsID.push(getDate(responseObj[0].on));
+      mydata.push((responseObj[0].off - responseObj[0].on) * 0.01);
+      var l = responseObj.length;
+
+      for(i = 1; i < 10; i++){
+          labelsID.push(getDate(responseObj[i].on));
+          mydata.push(mydata[i-1] + (responseObj[i].off - responseObj[i].on) * 0.01);
+      }
+
+      var lineChartData = {
+         labels : labelsID,
+         datasets : [
+         {
+          label: "My First dataset",
+          fillColor : "rgba(220,220,220,0.2)",
+          strokeColor : "rgba(220,220,220,1)",
+          pointColor : "rgba(220,220,220,1)",
+          pointStrokeColor : "#fff",
+          pointHighlightFill : "#fff",
+          pointHighlightStroke : "rgba(220,220,220,1)",
+          data : mydata
+         }
+         ]
+      }
+
+      console.log(lineChartData);
+      var ctx = document.getElementById("canvas").getContext("2d");
+      window.myLine = new Chart(ctx).Line(lineChartData, {
+               responsive: true});
+
+    }
+
+    window.onload = function(){
+      request = new XMLHttpRequest();
+      request.onload = plotChart;
+      request.open('get', 'http://m.rednaks.tn/data.json', true);
+      request.send();
+
+
+    }
+
+
+</script>
+</body>
+</html>
