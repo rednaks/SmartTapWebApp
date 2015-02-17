@@ -6,9 +6,12 @@
 	</head>
 	<body>
 		<div style="width: 50%; position:relative; margin-left:auto;marigin-right:auto;">
-			<center><h2>Your Title</h2></center>
-			<canvas id="canvas" height="550" width="700"></canvas>
-		</div>
+			<center><h2>How much did you consume ?</h2></center>
+			<canvas id="evo" height="550" width="700"></canvas>
+
+			<center><h2>Usage</h2></center>
+			<canvas id="cons" height="550" width="700"></canvas>
+			</div>
 
 
 	<script>
@@ -26,11 +29,17 @@
       var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
       var labelsID = [];
       var mydata = [];
+      var evoData = [];
+
+      labelsID.push(getDate(responseObj[0].on));
+      evoData.push((responseObj[0].off - responseObj[0].on) * 0.01);
+      mydata.push((responseObj[0].off - responseObj[0].on) * 0.01);
 
 
-      for(i = 0; i < 10/*responseObj.length*/; i++){
+      for(i = 1; i < 15/*responseObj.length*/; i++){
           labelsID.push(getDate(responseObj[i].on));
           mydata.push((responseObj[i].off - responseObj[i].on) * 0.01);
+          evoData.push(mydata[i-1] + (responseObj[i].off - responseObj[i].on) * 0.01);
       }
 
       var lineChartData = {
@@ -54,7 +63,11 @@
       window.myLine = new Chart(ctx).Bar(lineChartData, {
                responsive: true});
 
-    }
+      var ctx = document.getElementById("canvas").getContext("2d");
+      window.myLine = new Chart(ctx).Line(lineChartData, {
+               responsive: true});
+
+}
 
     window.onload = function(){
       request = new XMLHttpRequest();
