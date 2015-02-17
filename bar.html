@@ -1,13 +1,17 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Bar Chart</title>
+		<title>SmartTap Data</title>
 		<script src="js/Chart.js"></script>
 	</head>
 	<body>
-		<div style="width: 50%">
-			<canvas id="canvas" height="550" width="700"></canvas>
-		</div>
+		<div style="width:30%;position:relative ; margin-left: auto; margin-right: auto;">
+			<center><h2>How much did you consume ? <div id="lit"></div></h2></center>
+			<canvas id="evo" height="550" width="600"></canvas>
+
+			<center><h2>Usage <br/><div id="avg"></div></h2></center>
+			<canvas id="cons" height="550" width="500"></canvas>
+    </div>
 
 
 	<script>
@@ -25,18 +29,40 @@
       var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
       var labelsID = [];
       var mydata = [];
+      var evoData = [];
+
+      labelsID.push(getDate(responseObj[0].on));
+      evoData.push((responseObj[0].off - responseObj[0].on) * 0.01);
+      mydata.push((responseObj[0].off - responseObj[0].on) * 0.01);
 
 
-      for(i = 0; i < 10/*responseObj.length*/; i++){
+      for(i = 1; i < 15/*responseObj.length*/; i++){
           labelsID.push(getDate(responseObj[i].on));
           mydata.push((responseObj[i].off - responseObj[i].on) * 0.01);
+          evoData.push(evoData[i-1] + (responseObj[i].off - responseObj[i].on) * 0.01);
       }
 
       var lineChartData = {
          labels : labelsID,
          datasets : [
          {
-          label: "My First dataset",
+          label: "Evo Data",
+          fillColor : "rgba(220,220,220,0.2)",
+          strokeColor : "rgba(220,220,220,1)",
+          pointColor : "rgba(220,220,220,1)",
+          pointStrokeColor : "#fff",
+          pointHighlightFill : "#fff",
+          pointHighlightStroke : "rgba(220,220,220,1)",
+          data : evoData
+         }
+         ]
+      }
+
+      var barChartData = {
+         labels : labelsID,
+         datasets : [
+         {
+          label: "Cons data",
           fillColor : "rgba(220,220,220,0.2)",
           strokeColor : "rgba(220,220,220,1)",
           pointColor : "rgba(220,220,220,1)",
@@ -48,10 +74,19 @@
          ]
       }
 
+
       console.log(lineChartData);
-      var ctx = document.getElementById("canvas").getContext("2d");
-      window.myLine = new Chart(ctx).Bar(lineChartData, {
+      var ctx = document.getElementById("cons").getContext("2d");
+      window.myLine = new Chart(ctx).Bar(barChartData, {
                responsive: true});
+
+      var ctx = document.getElementById("evo").getContext("2d");
+      window.myLine = new Chart(ctx).Line(lineChartData, {
+               responsive: true});
+
+      var totalCons = evoData[evoData.length - 1];
+      var lit = document.getElementById("lit").innerHTML = totalCons.toFixed(2) + "L";
+      var avg = document.getElementById("avg").innerHTML = (totalCons / 15).toFixed(2) + "L" ;
 
     }
 
